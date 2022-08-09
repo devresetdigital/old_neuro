@@ -1,0 +1,48 @@
+.bordered{
+    border: 1px solid #e4eaec;
+    margin: 0;
+    padding: 0.8em;
+}
+.file-field{
+    width:100%;
+}
+.father {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+.child1{
+    flex: 0 0 20%;
+}
+.child3{
+    flex: 0 0 75%;
+}
+.results{
+    flex: 1;
+    margin-top: 1.5em;
+}
+.summary{
+    display: flex;
+    justify-content: end;
+    flex-wrap: wrap;
+}
+p,
+dt {
+    font-weight: bold;
+}
+dl,
+dd {
+    font-size: .9rem;
+    flex: 0 0 33%;
+}
+.save-container{
+    text-align: end;
+    padding-right: 1em;
+}
+.help {
+    cursor: pointer;
+}
+.error{
+    color: #ff0000d4;
+    font-weight: bold;
+}

@@ -1,0 +1,11 @@
+{
+    "name": "custom/trackinglogs",
+    "description": "Tracking Logs for users",
+    "authors": [
+        {
+            "name": "sebas",
+            "email": "sebas@sebas.com"
+        }
+    ],
+    "require": {}
+}

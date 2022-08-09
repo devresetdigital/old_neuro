@@ -1,0 +1,1 @@
+<!--<script>document.location.href="http://amas.resetdigital.co/admin/";</script>-->

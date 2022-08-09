@@ -1,0 +1,52 @@
+import React, { useState } from 'react';
+import { Sortable, Plugins } from '@shopify/draggable';
+
+const CreativesForm = ({ onSubmit, initialValues }) => {
+  // Filter Creatives by Name
+  // Creatives must be Draggable
+  // Selected Creatives must update State
+  // Push Creatives
+
+  const renderArr = () => {
+    console.log(initialValues.loaded);
+    arr.map(item => <h4>{item}</h4>);
+  };
+
+  const renderConcepts = () => {
+    ADVERTISER_CONCEPTS.map(item => {
+      return <div key={item.id}>{item.label}</div>;
+    });
+  };
+  return (
+    <div className="ui grid">
+      <div className="eight wide column">
+        <div className="ui table">
+          <thead>
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ADVERTISER_CONCEPTS.map(item => (
+              <tr key={item.value}>
+                <td>{item.label}</td>
+              </tr>
+            ))}
+          </tbody>
+        </div>
+      </div>
+      <div className="eight wide column">
+        <div className="ui table">
+          <thead>
+            <tr>
+              <th>Selected Concepts</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreativesForm;
