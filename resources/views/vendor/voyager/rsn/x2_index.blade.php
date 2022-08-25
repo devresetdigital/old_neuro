@@ -319,7 +319,7 @@ chart
                                                     </div>
                                                     <div class="col-sm-12" style="padding-left: left 20%; margin-bottom: 2em;">
                                                     <h4 style="border-bottom: 3px solid #ccc;" id="reportlabel">Report: </h4>
-                                                        <div class="card" id="signalsCardContainer" >
+                                                        <div class="card" id="signalsCardContainer"  style="padding: 18%;     padding-top: 0;" >
                                                     </div>
                                                 </div>
                                             </div>
