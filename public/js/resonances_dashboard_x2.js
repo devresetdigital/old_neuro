@@ -171,7 +171,7 @@ const getData = async () => {
                         <h4 style="border-bottom: 3px solid #ccc;">Preview: </h4>
                         <div style="
                         background-image : url(${preview_url});
-                        width:auto; height:400px; background-repeat: no-repeat;
+                        width:auto; height:400px; background-repeat: no-repeat; background-size: contain;
                         "></div>
                     `;
                     }else{
