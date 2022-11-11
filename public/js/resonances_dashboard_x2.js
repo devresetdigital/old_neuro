@@ -20,13 +20,13 @@ let colors = [
  ];
  $('#reportlabel').hide();
 $(document).ready(function () {
-   
+    $('#loading').hide();
     $.fn.dataTable.ext.errMode = 'none';
     initView();
     $('#campaignSelector').change(async function () {
         $('#filters-container-loading').show();
         $('#filters-container').hide();
-
+        $('#signalsCardContainer').empty();
         $('#topRalatedResonancesContainer-loading').show();
         $('#topRalatedResonancesContainer').hide();
 
@@ -118,14 +118,19 @@ let filters = {
 let tops = [];
 
 const getData = async () => {
+    $('#loading').show();
+ 
     $('#signalPreview').empty();
 
     let campaign = $('#campaignSelector').val();
 
     if (campaign != '') {
+
         await $.get("/api/get_signals_by_campaign/" + campaign, function (data) {
             signals = [ ...data ];
         });
+
+       /*
         await $.get("/api/get_neuro_campaign/" + campaign, function (data) {
             campaign =  data ;
             assets = JSON.parse(data.assets);
@@ -179,20 +184,46 @@ const getData = async () => {
                 }
             }
         });
-
+        */
     }
 
 }
 
 const loadSignals = () => {
-
+    
+  
     $('#signalsCardContainer').empty();
+    
+    for (const  [index, iterator]  of signals.entries()) {
+        $('#signalsCardContainer').append(`
+            <div class='row' style='padding-left:2em; padding-right:2em; '>
+                <h4 style="border-bottom: 3px solid #ccc; padding-left: 2em;" >${iterator.name}</h4>
+                <div class="col-sm-4" style='background-image: url(${iterator.preview});
+                height: 600px;
+                background-repeat: no-repeat;
+                background-size: contain;
+                '>
+                </div>
+                <div class="col-sm-8">
+                        <canvas id="Chart_radar_${iterator.id}" width="600" height="400"></canvas>
+                </div>
+            </div>
+        `);
+        loadSignalChart(iterator.rsn_x_two_items_data, `Chart_radar_${iterator.id}`);
+    }
+
+    $('#loading').hide();
+} 
+
+const loadSignalChart = (chartData, id ) => {
+
 
     let datasetRadar = [];
     let entriesLabels = [];
 
     let keyToShow = [];
-    for (const  [index, iterator]  of signals.entries()) {
+    for (const  [index, iterator]  of chartData.entries()) {
+       
         let data = JSON.parse(iterator.data)
         delete data.name;
         let totalScore = 0;
@@ -209,10 +240,9 @@ const loadSignals = () => {
                 keyToShow.push(name);
             }
         }
-
     }
-    console.log(signals);
-    for (const  [index, iterator]  of signals.entries()) {
+
+    for (const  [index, iterator]  of chartData.entries()) {
   
         let data = JSON.parse(iterator.data);
 
@@ -245,16 +275,11 @@ const loadSignals = () => {
 
     }
 
-
     $('#reportlabel').show();
-    console.log(entriesLabels);
+
     if(entriesLabels.length>0){
 
-        let html = `<canvas id="Chart_radar" width="600" height="400"></canvas>`;
-    
-        $('#signalsCardContainer').append(html);
-
-        var marksCanvas =  document.getElementById("Chart_radar");
+        var marksCanvas =  document.getElementById(id);
 
         var marksData = {
             labels: entriesLabels,
@@ -285,15 +310,7 @@ const loadSignals = () => {
             options: options
         });
 
-    }else{
-        let html = `<h3 style="text-align:center; margin:2em">The report is under review, it will be displayed soon</h3>`;
-        $('#signalsCardContainer').append(html);
     }
-
-   
-
-
-   
 
     return true;
 }

@@ -311,20 +311,20 @@ chart
                                     <div class="">&nbsp;</div>
                                     <div class="col-sm-12">
                                             <p>Signals</p>
-
                                             <div class="card" id="">
+                                            <img src="{{ asset('/Loading.gif') }}" id="loading" style="position: absolute;
+                                                    width: 3.5em;
+                                                    z-index: 1;
+                                                    margin-top: 3px;" alt="">
                                                 <div class="card-body">
-                                                    <div class="col-sm-12" id="signalPreview">
-                                                        
-                                                    </div>
+                                                
+                                                    <div class="col-sm-12" id="signalPreview"></div>
                                                     <div class="col-sm-12" style="padding-left: left 20%; margin-bottom: 2em;">
-                                                    <h4 style="border-bottom: 3px solid #ccc;" id="reportlabel">Report: </h4>
-                                                        <div class="card" id="signalsCardContainer" >
+                                                        <div class="card" id="signalsCardContainer">
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        
-                                        </div>
                                     </div>
                                     <div class="">&nbsp;</div>
                                 </div>

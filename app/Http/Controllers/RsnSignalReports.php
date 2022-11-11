@@ -22,7 +22,6 @@ class RsnSignalReports extends Controller
      * returns signals for a certain campaign
      */
     public function getSignalsByCampaign(Request $request, $id){
-        
         $signals = Cache::get('signal_campaigns_'.intval($id));
 
         if($signals == null){
@@ -41,16 +40,6 @@ class RsnSignalReports extends Controller
     }
 
     private function get_signals($campaign_id) {
-
-        try {
-           
-
-
-
-
-        } catch (\Throwable $th) {
-          return [];
-        }
 
         Cache::forget('signal_campaigns_'.intval($campaign_id));
 
@@ -84,7 +73,7 @@ class RsnSignalReports extends Controller
             }
 
         } else {
-            $response = RsnXTwoItems::where('signal_campaign_id', $campaign_id)->get()->toArray();
+            $response = RsnXTwoItems::where('signal_campaign_id', $campaign_id)->with('RsnXTwoItemsData')->get()->toArray();
         }
         return $response;
 

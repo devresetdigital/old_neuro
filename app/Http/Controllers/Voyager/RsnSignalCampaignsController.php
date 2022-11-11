@@ -32,6 +32,7 @@ use App\RsnSignalSoma;
 use App\RsnSignalMythic;
 use App\RsnSignalPathosEthos;
 use App\RsnSignalPersonalState;
+use App\RsnXTwoItemsData;
 use Illuminate\Support\Facades\Cache;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -573,6 +574,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         $signals = RsnSignalSignal::where('signal_campaign_id',$campaign_id)->get()->toArray();
         RsnSignalSignal::where('signal_campaign_id',$campaign_id)->delete();
         RsnXTwoItems::where('signal_campaign_id',$campaign_id)->delete();
+        RsnXTwoItemsData::where('signal_campaign_id',$campaign_id)->delete();
 
         foreach ($signals as $key => $signal) {
             RsnSignalSoma::where('signal_id', $signal['id'])->delete();
@@ -610,6 +612,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
     private function x2_import($path, $campaign_id){
         
         try {
+
             DB::beginTransaction();
 
             $this->deleteData($campaign_id);
@@ -621,26 +624,59 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
             $spreadsheet = $reader->load($path);
             
-            //-----------------Signals------------------------
-            $data = $spreadsheet->getSheet(0)->toArray();
-            $signals=[];
+            
           
-            foreach ($data as $key => $signal) {
-               
-                if($key>0 && $signal[1] !== null){
-                  
-                    $data_new = [];
-                    foreach ($signal as $j => $value) {
-                        $data_new[$data[0][$j]] = $value;
+            $signals=[];
+
+            $sheetCount = $spreadsheet->getSheetCount();
+            for ($i = 0; $i < $sheetCount; $i++) {
+                $data = $spreadsheet->getSheet($i)->toArray();
+
+                if ($i == 0 ){
+                    //-----------------Signals------------------------
+                    foreach ($data as $key => $signal) {
+                        if($key>0 && $signal[1] !== null){
+                            $new = new RsnXTwoItems();
+                            $new->name =  $signal[1];
+                            $new->signal_campaign_id = $campaign_id;
+                            $new->preview =  $signal[2];
+                            $new->save();
+                            $signals[$signal[0]] = $new->id;
+                        }
                     }
-                    $new = new RsnXTwoItems();
-                    $new->name =  $signal[0];
-                    $new->signal_campaign_id = $campaign_id;
-                    $new->data = json_encode($data_new);
-                    $new->save();
-                    $signals[$signal[0]] = $new->id;
+
+                } else {
+                    //-----------------Signals Data------------------------
+                    $labels =[];
+                    foreach ($data as $key => $signal) {
+                        
+                        if($key == 0 ){
+                            foreach ($signal as $k => $label) {
+                                if ($k > 1 && $label!=''){
+                                    $labels[$k]=$label;
+                                }
+                            }
+                        }
+
+                        if($key!=0 && $signal[0] != '' && array_key_exists($signal[0],$signals)) {
+                            $new = new RsnXTwoItemsData();
+                            $new->name =  $signal[1];
+                            $new->signal_campaign_id = $campaign_id;
+                            $new->item_id = $signals[$signal[0]];
+                            $data=[];
+                            foreach ($signal as $j => $value) {
+                                if ($j > 1 && count($labels) > $j ){
+                                    $data[$labels[$j]]=$value;
+                                }
+                            }
+                            $new->data =  json_encode($data);
+                            $new->save();
+                        }
+                    }
                 }
+                  
             }
+
 
         } catch (\Throwable $th) {
             dd($th->getMessage(), $th->getTrace());
