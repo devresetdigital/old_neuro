@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Support\Facades\Cache;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,9 +13,15 @@
 
 
 Route::get('/', function () {
-    return redirect()->route('reports');
-
+    return redirect('/admin/login');
 });
+Route::get('flush', function () {
+   if(Cache::flush()){
+       return 'cache flushed';
+   }
+   return 'cannot flush the cache';
+});
+
 
 //List Campaigns
 Route::get('import_locations','ImportLocationController@index');

@@ -198,13 +198,13 @@ const loadSignals = () => {
         $('#signalsCardContainer').append(`
             <div class='row' style='padding-left:2em; padding-right:2em; '>
                 <h4 style="border-bottom: 3px solid #ccc; padding-left: 2em;" >${iterator.name}</h4>
-                <div class="col-sm-4" style='background-image: url(${iterator.preview});
+                <div class="col-sm-3" style='background-image: url(${iterator.preview});
                 height: 600px;
                 background-repeat: no-repeat;
                 background-size: contain;
                 '>
                 </div>
-                <div class="col-sm-8">
+                <div class="col-sm-9">
                         <canvas id="Chart_radar_${iterator.id}" width="600" height="400"></canvas>
                 </div>
             </div>

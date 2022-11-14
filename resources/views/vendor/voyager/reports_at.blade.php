@@ -11,9 +11,7 @@
              type: "text/css",
              href: "https://cdn.datatables.net/buttons/1.6.0/css/buttons.dataTables.min.css"
          }).appendTo("head");*/
-        <?php if($_SERVER["HTTP_HOST"] == "panel.neuro-programmatic.com"){ ?>
-            document.location.href="http://panel.neuro-programmatic.com/admin/X2_report";
-        <?php } ?>
+        document.location.href="/admin/X2_report";
     </script>
     <div class="page-content">
         @include('voyager::alerts')
