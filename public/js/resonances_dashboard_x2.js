@@ -241,7 +241,7 @@ const loadSignalChart = (chartData, id ) => {
         let average =totalScore/count;
         let limitToShow = (average)+((maxValue-average)/4);
         for (let [name,value] of Object.entries(data)) {
-            if (parseFloat(value) >= limitToShow ){
+            if (data.length <=5 || parseFloat(value) >= limitToShow ){
                 keyToShow.push(name);
             }
         }
