@@ -424,7 +424,6 @@ TD {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
-    <script src="http://dsp.resetdigital.co/dsp-demo/dsp-demo/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
 
     <script src="https://code.highcharts.com/highcharts.js"></script>
