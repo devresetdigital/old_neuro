@@ -331,6 +331,8 @@ const loadSignalChart = (chartData, id ) => {
         };
     
         var options = {
+            responsive: true,
+            maintainAspectRatio: false,
             scale: {
                 ticks: {
                     beginAtZero: true,
