@@ -195,20 +195,59 @@ const loadSignals = () => {
     $('#signalsCardContainer').empty();
     
     for (const  [index, iterator]  of signals.entries()) {
+
+
+        let preview = '';
+        let preview_url = iterator.preview;
+
+        if (
+            preview_url.indexOf('.mp4')>= 0 ||
+            preview_url.indexOf('.webm')>= 0 ||
+            preview_url.indexOf('.ogg')>= 0 ||
+            preview_url.indexOf('.avi')>= 0 ||
+            preview_url.indexOf('.mov')>= 0 
+        ){
+            preview = `
+           
+                    <video style="width:100%; height:auto" controls>
+                        <source src="${preview_url}" type="video/mp4">
+                        <source src="${preview_url}" type='video/webm'>
+                        <source src="${preview_url}" type='video/ogg'>
+                        <source src="${preview_url}" type='video/avi'>
+                        <source src="${preview_url}" type='video/mov'>
+                        Your browser does not support the video tag. <!-- Text to be shown incase browser doesnt support html5 -->
+                    </video>
+            `;
+        }else if (
+            preview_url.indexOf('.jpeg')>= 0 ||
+            preview_url.indexOf('.jpg')>= 0 ||
+            preview_url.indexOf('.png')>= 0 ||
+            preview_url.indexOf('.svg')>= 0
+        ){
+            preview = `
+            <div style="
+            background-image : url(${preview_url});
+            width:auto; height:400px; background-repeat: no-repeat; background-size: contain;
+            "></div>
+        `;
+        }else{
+            preview = `
+            <a  href="${preview_url}" download> <div class="icon voyager-file-text"></div>Download Files</a>
+        `;
+        }
+
         $('#signalsCardContainer').append(`
             <div class='row' style='padding-left:2em; padding-right:2em; '>
                 <h4 style="border-bottom: 3px solid #ccc; padding-left: 2em;" >${iterator.name}</h4>
-                <div class="col-sm-3" style='background-image: url(${iterator.preview});
-                height: 600px;
-                background-repeat: no-repeat;
-                background-size: contain;
-                '>
+                <div class="col-sm-5" >
+                    ${preview}
                 </div>
-                <div class="col-sm-9">
+                <div class="col-sm-7">
                         <canvas id="Chart_radar_${iterator.id}" width="600" height="400"></canvas>
                 </div>
             </div>
         `);
+
         loadSignalChart(iterator.rsn_x_two_items_data, `Chart_radar_${iterator.id}`);
     }
 
