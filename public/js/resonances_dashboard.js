@@ -76,7 +76,7 @@ $(document).ready(function () {
             mybutton.fadeOut(600);
         }
     }
-
+    updateAdvertisers();
 });
 
 let signals = [];

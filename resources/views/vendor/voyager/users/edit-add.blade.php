@@ -63,18 +63,7 @@
                                 <input type="password" class="form-control" id="password" name="password" value="" autocomplete="new-password">
                             </div>
 
-                            @can('editRoles', $dataTypeContent)
-                                <div class="form-group">
-                                    <label for="default_role">{{ __('Role') }}</label>
-                                    <select class="form-control select2 select2-hidden-accessible" name="smart_pixel_id"  id="smart_pixel_id" tabindex="-1" aria-hidden="true">
-                                            @foreach($roles as $role)
-                                                @if($role->id >= Auth::user()->role_id)
-                                                    <option  {{($dataTypeContent->role_id == $role->id) ? 'selected' : ''}} value="{{$role->id}}">{{$role->name}}</option>
-                                                @endif
-                                            @endforeach
-                                    </select>
-                                </div>
-                            @endcan
+  
                             @php
                                 if (isset($dataTypeContent->locale)) {
                                     $selected_locale = $dataTypeContent->locale;

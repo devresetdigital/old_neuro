@@ -284,7 +284,6 @@ chart
                                             <label for="organization">Organization</label>
                                             <select class="form-control select2 select2-hidden-accessible "
                                                 name="organization" id="organization" style="width: 100%">
-                                                <option value="">None</option>
                                                 @foreach($organizations as $organization)
                                                     <option value="{{ $organization['id'] }}">
                                                         {{ $organization['name'] }}</option>

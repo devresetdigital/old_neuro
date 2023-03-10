@@ -33,8 +33,10 @@ use App\RsnSignalMythic;
 use App\RsnSignalPathosEthos;
 use App\RsnSignalPersonalState;
 use App\RsnXTwoItemsData;
+use App\Advertiser;
 use Illuminate\Support\Facades\Cache;
-
+use Auth;
+use JsonSchema\Uri\Retrievers\FileGetContents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -86,6 +88,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $search_filter = ($search->filter == 'equals') ? '=' : 'LIKE';
                 $search_value = ($search->filter == 'equals') ? $search->value : '%'.$search->value.'%';
                 $query->where($search->key, $search_filter, $search_value);
+            }
+            if(Auth::user()->role_id == 6) {
+                $query->where("organization_id","=",Auth::user()->organization_id);
             }
 
             if ($orderBy && in_array($orderBy, $dataType->fields())) {
@@ -226,7 +231,15 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             $view = "voyager::$slug.edit-add";
         }
 
-        return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
+        
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $advertisers = Advertiser::all();
+        }else{
+            $advertisers = Advertiser::where('organization_id' ,Auth::user()->organization_id )->get();
+        }
+
+        return Voyager::view($view, compact('dataType', 'advertisers', 'dataTypeContent', 'isModelTranslatable'));
     }
 
     // POST BR(E)AD
@@ -275,6 +288,12 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $errors=['there was an error trying to import the data, please try again'];
                 return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
                 ->with(compact('errors'));
+            }
+
+            try {
+                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
+            } catch (\Throwable $th) {
+                
             }
 
             event(new BreadDataUpdated($dataType, $data));
@@ -331,7 +350,14 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             $view = "voyager::$slug.edit-add";
         }
 
-        return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable'));
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $advertisers = Advertiser::all();
+        }else{
+            $advertisers = Advertiser::where('organization_id' ,Auth::user()->organization_id )->get();
+        }
+
+        return Voyager::view($view, compact('dataType', 'advertisers','dataTypeContent', 'isModelTranslatable'));
     }
 
     /**
@@ -346,6 +372,11 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         $slug = $this->getSlug($request);
 
         $dataType = Voyager::model('DataType')->where('slug', '=', $slug)->first();
+
+        if(!$request->has('organization_id')){
+            $request->merge(['organization_id' => Auth::user()->organization_id]);
+        }
+        
 
         // Check permission
         $this->authorize('add', app($dataType->model_name));
@@ -380,6 +411,11 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 return response()->json(['errors' => 'There was an error trying to import the data, please try again']);
             }
 
+            try {
+                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
+            } catch (\Throwable $th) {
+                
+            }
             return redirect()
                 ->route("voyager.{$dataType->slug}.index")
                 ->with([

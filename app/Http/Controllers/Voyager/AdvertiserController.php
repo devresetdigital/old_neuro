@@ -73,7 +73,7 @@ class AdvertiserController extends VoyagerBaseController
                 });
             }
 
-            if(Auth::user()->role_id == 2 || Auth::user()->role_id == 3) {
+            if(Auth::user()->role_id ==6) {
                 $logged_user = User::where('id', '=', Auth::user()->id)->get();
                 $query->where("organization_id","=",$logged_user[0]->organization_id);
             }
@@ -335,6 +335,11 @@ class AdvertiserController extends VoyagerBaseController
         if (!$request->has('_validate')) {
             $data = $this->insertUpdateData($request, $slug, $dataType->addRows, new $dataType->model_name());
 
+            $is_admin = (Auth::user()->role_id == 1) ? true :false;
+            if(!$is_admin){
+                $data->organization_id =Auth::user()->organization_id;
+                $data->save();
+            }
             event(new BreadDataAdded($dataType, $data));
 
             if ($request->ajax()) {

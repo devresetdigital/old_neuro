@@ -174,7 +174,7 @@
                                         <td class="no-sort no-click actions text-right" id="bread-actions">
                                         <div class="btn-group">
                                                 <a href="/admin/{{$dataType->slug}}/{{$data->id}}/edit" class="btn btn-sm btn-primary edit">
-                                                    Edit Campaign
+                                                    Edit
                                                 </a>
                                             </div>
                                         </td>

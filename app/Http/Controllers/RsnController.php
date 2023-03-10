@@ -34,7 +34,13 @@ class RsnController extends Controller
         }
         $campaigns= [];
 
-        $organizations = Organization::all();
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $organizations = Organization::all();
+        }else{
+            $organizations = Organization::where('id' ,Auth::user()->organization_id )->get();
+
+        }
 
         return Voyager::view('voyager::rsn.index', compact('campaigns','organizations'));
     }
@@ -49,7 +55,15 @@ class RsnController extends Controller
         }
         $campaigns= [];
 
-        $organizations = Organization::all();
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $organizations = Organization::all();
+        }else{
+            $organizations = Organization::where('id' ,Auth::user()->organization_id )->get();
+
+        }
+
+        
 
         return Voyager::view('voyager::rsn.x2_index', compact('campaigns','organizations'));
     }
@@ -64,7 +78,13 @@ class RsnController extends Controller
         }
         $campaigns = RsnSignalCampaign::all();
 
-        $organizations = Organization::all();
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $organizations = Organization::all();
+        }else{
+            $organizations = Organization::where('id' ,Auth::user()->organization_id )->get();
+
+        }
 
         return Voyager::view('voyager::rsn.dashboard', compact('campaigns','organizations'));
     }

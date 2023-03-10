@@ -55,21 +55,19 @@
                 }
             }
         @endphp
-    @if((Auth::user()->role->name!="Datapixels" && Auth::user()->role->name != "neuro") || (Auth::user()->role->name == "Datapixels" && $transItem->title=="Pixel Analytics"))
-    <li class="{{ implode(" ", $listItemClass) }}">
-        <a {!! $linkAttributes !!} target="{{ $item->target }}" style="color:{{ (isset($item->color) && $item->color != '#000000' ? $item->color : '') }}">
-            <span class="icon {{ $item->icon_class }}"></span>
-            <span class="title">{{ $transItem->title }}</span>
-        </a>
-        @if($hasChildren)
-            <div id="{{ $transItem->id }}-dropdown-element" class="panel-collapse collapse {{ (in_array('active', $listItemClass) ? 'in' : '') }}">
-                <div class="panel-body">
-                    @include('voyager::menu.admin_menu', ['items' => $item->children, 'options' => $options, 'innerLoop' => true])
-                </div>
-            </div>
-        @endif
-    </li>
-    @endif
+                <li class="{{ implode(" ", $listItemClass) }}">
+                    <a {!! $linkAttributes !!} target="{{ $item->target }}" style="color:{{ (isset($item->color) && $item->color != '#000000' ? $item->color : '') }}">
+                        <span class="icon {{ $item->icon_class }}"></span>
+                        <span class="title">{{ $transItem->title }}</span>
+                    </a>
+                    @if($hasChildren)
+                        <div id="{{ $transItem->id }}-dropdown-element" class="panel-collapse collapse {{ (in_array('active', $listItemClass) ? 'in' : '') }}">
+                            <div class="panel-body">
+                                @include('voyager::menu.admin_menu', ['items' => $item->children, 'options' => $options, 'innerLoop' => true])
+                            </div>
+                        </div>
+                    @endif
+                </li>
 @endforeach
 
 </ul>

@@ -68,7 +68,7 @@ class UserController extends VoyagerBaseController
                 });
             }
 
-            if(Auth::user()->role_id == 2 || Auth::user()->role_id == 3) {
+            if(Auth::user()->role_id == 6) {
                 $logged_user = User::where('id', '=', Auth::user()->id)->get();
                 $query->where("organization_id","=",$logged_user[0]->organization_id);
             }
@@ -305,8 +305,14 @@ class UserController extends VoyagerBaseController
 
         $roles = Voyager::model('Role')->get();
 
-        $organizations = Organization::all();
+        $is_admin = (Auth::user()->role_id == 1) ? true :false;
+        if($is_admin){
+            $organizations = Organization::all();
+        }else{
+            $organizations = Organization::where('id' ,Auth::user()->organization_id )->get();
+        }
 
+        
         return Voyager::view($view, compact('dataType', 'dataTypeContent', 'isModelTranslatable', 'organizations','roles'));
     }
 
@@ -341,6 +347,10 @@ class UserController extends VoyagerBaseController
                 $data->organization_id = $request->organization_id;
                 $data->save();
             }
+
+            $data->role_id = 6;
+            $data->save();
+
 
             event(new BreadDataAdded($dataType, $data));
 

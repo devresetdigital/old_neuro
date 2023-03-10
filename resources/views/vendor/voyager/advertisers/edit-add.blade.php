@@ -16,7 +16,6 @@
 
 @section('content')
     <div class="page-content edit-add container-fluid">
-        <div>v1</div>
         <div class="row">
             <div class="col-md-12">
 
@@ -68,7 +67,7 @@
                                     @else
                                         <div class="form-group @if($row->type == 'hidden') hidden @endif col-md-{{ $display_options->width or 12 }}" @if(isset($display_options->id)){{ "id=$display_options->id" }}@endif>
                                             {{ $row->slugify }}
-                                            @if($row->display_name == 'organizations' && (Auth::user()->role_id ==2 || Auth::user()->role_id ==3))
+                                            @if($row->display_name == 'organizations' && (Auth::user()->role_id ==6))
                                                 <input name="organization_id" value="{{$user_organization_id}}" type="hidden">
                                             @else
                                             <label for="name">{{ $row->display_name }}</label>
