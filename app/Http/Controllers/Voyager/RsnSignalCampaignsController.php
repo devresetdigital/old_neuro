@@ -394,6 +394,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 'assets' => UploaderHelper::formatData($request->input('assets'),$slug)
             ]);
 
+
             $data = $this->insertUpdateData($request, $slug, $dataType->addRows, new $dataType->model_name());
 
             event(new BreadDataAdded($dataType, $data));
@@ -402,13 +403,22 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 return response()->json(['success' => true, 'data' => $data]);
             }
 
-   
-
             /**
              * import data into tables
              */
             if(!$this->import_data($data->file_path,$data->id, $data->type)){
                 return response()->json(['errors' => 'There was an error trying to import the data, please try again']);
+            }
+
+            if($data->type == 'all'){
+                
+                $new = $data->replicate();
+                $new->type = 'hao';
+                $new->save();
+
+                $data->type='x2';
+                $data->save();
+
             }
 
             try {

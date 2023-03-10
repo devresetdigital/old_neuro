@@ -84,7 +84,7 @@
                                             @include('voyager::multilingual.input-hidden-bread-edit-add')
                                             @if($row->type == 'relationship')
                                                 @if ($row->field=='rsn_signal_campaign_belongsto_advertiser_relationship')
-                                                    <select class="form-control select2 select2-hidden-accessible" name="rsn_signal_campaign_belongsto_advertiser_relationship" tabindex="-1" aria-hidden="true">
+                                                    <select class="form-control select2 select2-hidden-accessible" name="advertiser_id" tabindex="-1" aria-hidden="true">
                                                         @foreach ($advertisers as $advertiser)
                                                          <option value="{{ $advertiser['id'] }}" selected="">{{ $advertiser['name'] }}</option>
                                                         @endforeach
