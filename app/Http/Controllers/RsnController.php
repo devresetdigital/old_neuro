@@ -32,6 +32,12 @@ class RsnController extends Controller
         if(!Auth::user()){
             return redirect('/admin/login');
         }
+
+        if(Auth::user()->role->id != 1){
+            return redirect('/admin/X2_report');
+        }
+
+
         $campaigns= [];
 
         $is_admin = (Auth::user()->role_id == 1) ? true :false;

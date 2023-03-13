@@ -268,9 +268,11 @@ chart
                         <div class="row m-0">
                             <div class="col-md-12">
                                 <ul class="nav nav-tabs">
-                                    <li class="">
-                                        <a data-toggle="" href="/admin/level1_report">Level 1</a>
-                                    </li>
+                                    @if (Auth::user()->role->id == 1)
+                                        <li class="">
+                                            <a data-toggle="" href="/admin/level1_report">Level 1</a>
+                                        </li>
+                                    @endif
                                     <li class="">
                                         <a data-toggle="" href="/admin/HAO-AI_Dashboard">HAO</a>
                                     </li>
