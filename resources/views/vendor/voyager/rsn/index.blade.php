@@ -229,11 +229,27 @@ TD {
                                         <div class="card">
                                             <div class="card-header">Upload and submit files</div>
                                             <div class="card-body">
-                                                <form id="formCreatives">
-                                                    <div id="formCreativesContainer">
-                                                        Upload Creatives: <input id="files-input" name="creative_files[]" type="file" class="file"  data-show-upload="true" data-show-caption="true" multiple>
+                                                @if ($errors->any())
+                                                    <div class="alert alert-danger">
+                                                        <ul>
+                                                            @foreach ($errors->all() as $error)
+                                                                <li>{{ $error }}</li>
+                                                            @endforeach
+                                                        </ul>
                                                     </div>
-                                                    <button type="button" class="btn btn-primary" onclick="document.getElementById('formCreatives').submit();">Submit</button>
+                                                @endif
+                                                <form id="formCreatives" method="POST" enctype="multipart/form-data">
+                                                    @csrf
+
+                                                    <div style="display: flex;flex-direction: column;">
+                                                        <label for="campaign-name">Name: </label>
+                                                        <input id="campaign-name" name="campaign_name" type="text" max="350" style="max-width: 300px;">
+                                                    </div>
+                                                    <div>
+                                                        <label for="creative_file">Upload Creatives: </label>
+                                                        <input id="creative_file" name="creative_file" type="file" class="file"  data-show-upload="true" data-show-caption="true" multiple>
+                                                    </div>
+                                                    <button class="btn btn-primary">Submit</button>
                                                     <br>
                                                 </form>
                                             </div>
