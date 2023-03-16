@@ -62,6 +62,8 @@ class ReportsController extends Controller
         }
         $reports.="]";*/
 
+        $reports = "";
+
         $from = Carbon::now()->subDays(6)->format("ymdH");
         $until = Carbon::now()->format("ymdH");
         //Organization

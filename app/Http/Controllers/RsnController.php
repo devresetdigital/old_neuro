@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Advertiser;
 use App\RsnCampaigns;
 use App\RsnAdNetworkDaypart;
 use App\RsnNetworks;
@@ -19,10 +20,48 @@ use DB;
 use Log;
 use App\Organization;
 use App\RsnSignalCampaign;
+use Illuminate\Support\Facades\Validator;
 
 class RsnController extends Controller
 {
    
+
+    public function storeRsnCampaign(Request $request)
+    {
+        $user = Auth::user();
+        $advertiser = Advertiser::where('organization_id', $user->organization_id)->first();
+
+        $validator = Validator::make($request->all(), [
+            'campaign_name' => 'required',
+            'creative_file' => 'required|file',
+        ]);
+
+        $validator->after(function ($validator) use ($advertiser) {
+            if (!$advertiser) {
+                $validator->errors()->add('advertiser', 'The organization does not have an assigned advertiser');
+            }
+        });
+
+        if ($validator->fails()) {
+            return redirect('admin/level1_report')
+                ->withErrors($validator);
+        }
+
+        $file = $request->file('creative_file');
+        $fileName = $file->getClientOriginalName();
+        $path = $file->storeAs('level1', date('ymdHis').'-'.$fileName, 'public');
+
+        try {
+            $campaign = RsnSignalCampaign::create([
+                'name' => $request->campaign_name,
+                'type' => 'level 1',
+                'organization_id' => $user->organization_id,
+                'advertiser_id' => $advertiser->id,
+                'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName .'}]'
+            ]);
+            file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$campaign->id);
+        } catch (\Throwable $th) {}
+    }
 
     /**
      * 

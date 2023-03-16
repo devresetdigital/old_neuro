@@ -57,6 +57,7 @@ Route::group(['prefix' => 'admin'], function () {
     
     Route::get('dashboard','DashboardController@index');
     Route::get('level1_report','RsnController@report');
+    Route::post('level1_report','RsnController@storeRsnCampaign');
     Route::get('X2_report','RsnController@x2_report');
 
     Route::get('HAO-AI_Dashboard','RsnController@dashboard');
