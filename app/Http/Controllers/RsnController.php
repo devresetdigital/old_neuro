@@ -40,7 +40,7 @@ class RsnController extends Controller
             if (!$advertiser) {
                 $validator->errors()->add('advertiser', 'The organization does not have an assigned advertiser');
             }
-        });
+        }); 
 
         if ($validator->fails()) {
             return redirect('admin/level1_report')
@@ -59,7 +59,9 @@ class RsnController extends Controller
                 'advertiser_id' => $advertiser->id,
                 'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName .'}]'
             ]);
-            file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$campaign->id);
+            
+            file_get_contents($_ENV('NOTIFICATIONS_URL')."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&advertiser_name={$advertiser->name}");
+            
         } catch (\Throwable $th) {}
     }
 

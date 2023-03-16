@@ -290,8 +290,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 ->with(compact('errors'));
             }
 
+            
             try {
-                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
+                $advertiser = Advertiser::find($data->advertiser_id);
+                file_get_contents($_ENV('NOTIFICATIONS_URL')."?campaign_id={$data->id}&campaign_name={$data->name}&advertiser_name={$advertiser->name}");
             } catch (\Throwable $th) {
                 
             }
@@ -422,7 +424,8 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
             try {
-                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
+                $advertiser = Advertiser::find($data->advertiser_id);
+                file_get_contents($_ENV('NOTIFICATIONS_URL')."?campaign_id={$data->id}&campaign_name={$data->name}&advertiser_name={$advertiser->name}");
             } catch (\Throwable $th) {
                 
             }
