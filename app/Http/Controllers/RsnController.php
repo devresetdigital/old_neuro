@@ -5,7 +5,6 @@ use App\Advertiser;
 use App\RsnCampaigns;
 use App\RsnAdNetworkDaypart;
 use App\RsnNetworks;
-use App\RsnDaypart;
 use App\RsnAds;
 use App\RsnResonances;
 use App\RsnAdNeedstate;
@@ -61,8 +60,11 @@ class RsnController extends Controller
             ]);
             
             file_get_contents($_ENV('NOTIFICATIONS_URL')."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&advertiser_name={$advertiser->name}");
-            
-        } catch (\Throwable $th) {}
+        } catch (\Throwable $th) {
+            return redirect('admin/level1_report')->with('error', 'Unexpected error when saving campaign. Please try again.');
+        }
+
+        return redirect('admin/level1_report');
     }
 
     /**

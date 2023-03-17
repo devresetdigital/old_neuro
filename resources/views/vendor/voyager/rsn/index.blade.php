@@ -238,6 +238,15 @@ TD {
                                                         </ul>
                                                     </div>
                                                 @endif
+                                                @if ($message = Session::get('error'))
+                                                <div class="alert alert-danger">
+                                                    <ul>
+                                                        <li>
+                                                            {{ $message }}
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                @endif
                                                 <form id="formCreatives" method="POST" enctype="multipart/form-data">
                                                     @csrf
 
