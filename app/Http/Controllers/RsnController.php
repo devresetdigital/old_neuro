@@ -61,6 +61,7 @@ class RsnController extends Controller
             
             file_get_contents($_ENV('NOTIFICATIONS_URL')."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&advertiser_name={$advertiser->name}");
         } catch (\Throwable $th) {
+            dd($th);
             return redirect('admin/level1_report')->with('error', 'Unexpected error when saving campaign. Please try again.');
         }
 
