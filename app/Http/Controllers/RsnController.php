@@ -47,19 +47,26 @@ class RsnController extends Controller
         }
 
         $file = $request->file('creative_file');
-        $fileName = $file->getClientOriginalName();
-        $path = $file->storeAs('level1', date('ymdHis').'-'.$fileName, 'public');
-
+        $ext = $file->getClientOriginalExtension();
+        // $fileName = $file->getClientOriginalName();
+        
         try {
             $campaign = RsnSignalCampaign::create([
                 'name' => $request->campaign_name,
-                'type' => 'level 1',
+                'type' => 'level1',
                 'organization_id' => $user->organization_id,
                 'advertiser_id' => $advertiser->id,
-                'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName .'}]'
+                // 'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName . '.' . $ext.'}]'
+            ]);
+
+            $fileName = $campaign->id.'_'.$campaign->name.'_'.date('mdy');
+            $path = $file->storeAs('level1', date('mdy').'-'.$fileName.'.'.$ext, 'public');
+
+            $campaign->update([
+                'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName . '.' . $ext.'}]'
             ]);
             
-            file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&advertiser_name={$advertiser->name}");
+            file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&advertiser_name={$advertiser->name}");
         } catch (\Throwable $th) {
             return redirect('admin/level1_report')->with('error', 'Unexpected error when saving campaign. Please try again.');
         }
