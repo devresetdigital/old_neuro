@@ -290,10 +290,12 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 ->with(compact('errors'));
             }
 
-            
             try {
                 $advertiser = Advertiser::find($data->advertiser_id);
-                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&advertiser_name={$advertiser->name}");
+                $media_file = json_decode($data->assets, true);
+                $path = urlencode($media_file[0]["download_link"]);
+
+                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}");
             } catch (\Throwable $th) {
                 
             }
@@ -425,7 +427,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
             try {
                 $advertiser = Advertiser::find($data->advertiser_id);
-                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&advertiser_name={$advertiser->name}");
+                $media_file = json_decode($data->assets, true);
+                $path = urlencode($media_file[0]["download_link"]);
+                
+                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}");
             } catch (\Throwable $th) {
                 
             }
