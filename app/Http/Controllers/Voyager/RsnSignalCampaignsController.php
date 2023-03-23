@@ -295,7 +295,12 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $media_file = json_decode($data->assets, true);
                 $path = urlencode($media_file[0]["download_link"]);
 
-                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}");
+                if ($_ENV['APP_DEBUG']) {
+                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                } else {
+                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                }
+                file_get_contents($url);
             } catch (\Throwable $th) {
                 
             }
@@ -430,7 +435,13 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $media_file = json_decode($data->assets, true);
                 $path = urlencode($media_file[0]["download_link"]);
                 
-                file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}");
+                if ($_ENV['APP_DEBUG']) {
+                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                } else {
+                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                }
+
+                file_get_contents($url);
             } catch (\Throwable $th) {
                 
             }

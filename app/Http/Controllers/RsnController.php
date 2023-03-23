@@ -65,8 +65,13 @@ class RsnController extends Controller
             $campaign->update([
                 'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName . '.' . $ext.'}]'
             ]);
-            
-            file_get_contents($_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}");
+
+            if ($_ENV['APP_DEBUG']) {
+                $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}&test=1";
+            } else {
+                $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}";
+            }
+            file_get_contents($url);
         } catch (\Throwable $th) {
             return redirect('admin/level1_report')->with('error', 'Unexpected error when saving campaign. Please try again.');
         }
