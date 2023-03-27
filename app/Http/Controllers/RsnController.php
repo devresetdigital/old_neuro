@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Validator;
 class RsnController extends Controller
 {
    
-
     public function storeRsnCampaign(Request $request)
     {
         $user = Auth::user();
@@ -67,9 +66,9 @@ class RsnController extends Controller
             ]);
 
             if ($_ENV['APP_DEBUG']) {
-                $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}&test=1";
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}&test=1";
             } else {
-                $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}";
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}";
             }
             file_get_contents($url);
         } catch (\Throwable $th) {

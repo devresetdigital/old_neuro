@@ -296,11 +296,25 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $path = urlencode($media_file[0]["download_link"]);
 
                 if ($_ENV['APP_DEBUG']) {
-                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
                 } else {
-                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
                 }
+                
                 file_get_contents($url);
+
+                if ($request->has('file_path') && $request->file_path) {
+                    $username = "";
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $_ENV['NOTIFICATIONS_URL']."?campaign_name={$data->name}&username={$username}&test=1";
+                    } else {
+                        $url = $_ENV['NOTIFICATIONS_URL']."?&campaign_name={$data->name}&username={$username}";
+                    }
+
+                    file_get_contents($url);
+                }
+
             } catch (\Throwable $th) {
                 
             }
@@ -436,9 +450,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 $path = urlencode($media_file[0]["download_link"]);
                 
                 if ($_ENV['APP_DEBUG']) {
-                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
                 } else {
-                    $url = $_ENV['NOTIFICATIONS_URL']."?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
                 }
 
                 file_get_contents($url);
