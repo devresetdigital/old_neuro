@@ -304,19 +304,17 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 file_get_contents($url);
 
                 if ($request->has('file_path') && $request->file_path) {
-                    $username = "";
 
                     if ($_ENV['APP_DEBUG']) {
-                        $url = $_ENV['NOTIFICATIONS_URL']."?campaign_name={$data->name}&username={$username}&test=1";
+                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?campaign_name={$data->name}&test=1";
                     } else {
-                        $url = $_ENV['NOTIFICATIONS_URL']."?&campaign_name={$data->name}&username={$username}";
+                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?&campaign_name={$data->name}";
                     }
 
                     file_get_contents($url);
                 }
 
             } catch (\Throwable $th) {
-                
             }
 
             event(new BreadDataUpdated($dataType, $data));
@@ -781,7 +779,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
             $path = json_decode($path,true);
             $path =  public_path('/storage/'.$path[0]['download_link']);
-    
+
             //-----------------read------------------------
             $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
             $spreadsheet = $reader->load($path);
@@ -860,7 +858,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
         } catch (\Throwable $th) {
-            dd($th->getMessage(), $th->getTrace());
+            dump("Invalid Report.");
+            dd($th->getMessage());
+
             DB::rollBack();
             return false;
         }
