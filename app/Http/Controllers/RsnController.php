@@ -1,10 +1,10 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Advertiser;
 use App\RsnCampaigns;
 use App\RsnAdNetworkDaypart;
 use App\RsnNetworks;
-use App\RsnDaypart;
 use App\RsnAds;
 use App\RsnResonances;
 use App\RsnAdNeedstate;
@@ -19,10 +19,64 @@ use DB;
 use Log;
 use App\Organization;
 use App\RsnSignalCampaign;
+use Illuminate\Support\Facades\Validator;
 
 class RsnController extends Controller
 {
    
+    public function storeRsnCampaign(Request $request)
+    {
+        $user = Auth::user();
+        $advertiser = Advertiser::where('organization_id', $user->organization_id)->first();
+
+        $validator = Validator::make($request->all(), [
+            'campaign_name' => 'required',
+            'creative_file' => 'required|file',
+        ]);
+
+        $validator->after(function ($validator) use ($advertiser) {
+            if (!$advertiser) {
+                $validator->errors()->add('advertiser', 'The organization does not have an assigned advertiser');
+            }
+        }); 
+
+        if ($validator->fails()) {
+            return redirect('admin/level1_report')
+                ->withErrors($validator);
+        }
+
+        $file = $request->file('creative_file');
+        $ext = $file->getClientOriginalExtension();
+        // $fileName = $file->getClientOriginalName();
+        
+        try {
+            $campaign = RsnSignalCampaign::create([
+                'name' => $request->campaign_name,
+                'type' => 'level1',
+                'organization_id' => $user->organization_id,
+                'advertiser_id' => $advertiser->id,
+                // 'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName . '.' . $ext.'}]'
+            ]);
+
+            $fileName = $campaign->id.'_'.$campaign->name.'_'.date('mdy');
+            $path = $file->storeAs('level1', date('mdy').'-'.$fileName.'.'.$ext, 'public');
+
+            $campaign->update([
+                'assets' => '[{"download_link":"'.$path.'","original_name":'. $fileName . '.' . $ext.'}]'
+            ]);
+
+            if ($_ENV['APP_DEBUG']) {
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}&test=1";
+            } else {
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$campaign->id}&campaign_name={$campaign->name}&campaign_type={$campaign->type}&assets=". urlencode($path) ."&advertiser_name={$advertiser->name}";
+            }
+            file_get_contents($url);
+        } catch (\Throwable $th) {
+            return redirect('admin/level1_report')->with('error', 'Unexpected error when saving campaign. Please try again.');
+        }
+
+        return redirect('admin/level1_report');
+    }
 
     /**
      * 

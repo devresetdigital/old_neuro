@@ -291,9 +291,30 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
             try {
-                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
-            } catch (\Throwable $th) {
+                $advertiser = Advertiser::find($data->advertiser_id);
+                $media_file = json_decode($data->assets, true);
+                $path = urlencode($media_file[0]["download_link"]);
+
+                if ($_ENV['APP_DEBUG']) {
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                } else {
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                }
                 
+                file_get_contents($url);
+
+                if ($request->has('file_path') && $request->file_path) {
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?campaign_name={$data->name}&test=1";
+                    } else {
+                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?&campaign_name={$data->name}";
+                    }
+
+                    file_get_contents($url);
+                }
+
+            } catch (\Throwable $th) {
             }
 
             event(new BreadDataUpdated($dataType, $data));
@@ -422,7 +443,17 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
             try {
-                file_get_contents('http://143.198.70.7/api/send-neuro-notification?campaign_id='.$data->id);
+                $advertiser = Advertiser::find($data->advertiser_id);
+                $media_file = json_decode($data->assets, true);
+                $path = urlencode($media_file[0]["download_link"]);
+                
+                if ($_ENV['APP_DEBUG']) {
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
+                } else {
+                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                }
+
+                file_get_contents($url);
             } catch (\Throwable $th) {
                 
             }
@@ -748,7 +779,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
             $path = json_decode($path,true);
             $path =  public_path('/storage/'.$path[0]['download_link']);
-    
+
             //-----------------read------------------------
             $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
             $spreadsheet = $reader->load($path);
@@ -827,7 +858,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
         } catch (\Throwable $th) {
-            dd($th->getMessage(), $th->getTrace());
+            dump("Invalid Report.");
+            dd($th->getMessage());
+
             DB::rollBack();
             return false;
         }
