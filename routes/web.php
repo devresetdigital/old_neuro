@@ -39,7 +39,9 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('reports_embeded','ReportsController@reportsEmbeded');
     Route::get('daily_report','ReportsController@dailyReport');
-    Route::get('reports','ReportsController@index')->name('reports');
+    Route::get('reports', function () {
+        return redirect('/admin/X2_report');
+    });
     Route::get('reportsat','ReportsatController@index')->name('reports');
     //campaign reports
 
