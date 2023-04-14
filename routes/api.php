@@ -176,10 +176,9 @@ Route::post('rsn_campaign','RsnController@createCampaign');
 
 Route::get('get_signals_by_campaign/{id}','RsnSignalReports@getSignalsByCampaign');
 Route::get('get_neuro_campaign/{id}','RsnSignalReports@getCampaign');
+Route::get('get_domains_by_item/{id}','RsnSignalReports@get_domains_by_item');
 
-// LINEAR
-Route::post('linear/import','LinearController@import');
-Route::post('linear/get_table','LinearController@get_table');
+
 
 
 Route::get('sitelists','SitelistController@index');

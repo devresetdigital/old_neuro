@@ -34,6 +34,8 @@ use App\RsnSignalPathosEthos;
 use App\RsnSignalPersonalState;
 use App\RsnXTwoItemsData;
 use App\Advertiser;
+use App\Domains;
+use App\Rsn_x_two_items_domains;
 use Illuminate\Support\Facades\Cache;
 use Auth;
 use JsonSchema\Uri\Retrievers\FileGetContents;
@@ -284,7 +286,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
              */
 
 
-            if(!$this->import_data($data->file_path,$data->id,$data->type)){
+            if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
                 $errors=['there was an error trying to import the data, please try again'];
                 return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
                 ->with(compact('errors'));
@@ -315,6 +317,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 }
 
             } catch (\Throwable $th) {
+
             }
 
             event(new BreadDataUpdated($dataType, $data));
@@ -427,7 +430,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             /**
              * import data into tables
              */
-            if(!$this->import_data($data->file_path,$data->id, $data->type)){
+            if(!$this->import_data($data->file_path,$data->id, $data->type, $data->domains_report)){
                 return response()->json(['errors' => 'There was an error trying to import the data, please try again']);
             }
 
@@ -663,18 +666,19 @@ class RsnSignalCampaignsController extends VoyagerBaseController
     }
 
 
-    private function import_data($path, $campaign_id, $type){
+    private function import_data($path, $campaign_id, $type, $domains=null){
 
         if($path == null){
             return true;
         }
+     
        
         switch ($type) {
             case 'hao':
                 return $this->hao_import($path,$campaign_id);
                 break;
             case 'x2':
-                return $this->x2_import($path,$campaign_id);
+                return $this->x2_import($path,$campaign_id, $domains);
                 break;
             
             default:
@@ -686,11 +690,11 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
     }
 
-    private function x2_import($path, $campaign_id){
+    private function x2_import($path, $campaign_id, $domains=null){
         
         try {
 
-            DB::beginTransaction();
+            //DB::beginTransaction();
 
             $this->deleteData($campaign_id);
 
@@ -700,10 +704,8 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             //-----------------read------------------------
             $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
             $spreadsheet = $reader->load($path);
-            
-            
           
-            $signals=[];
+            $signals = [];
 
             $sheetCount = $spreadsheet->getSheetCount();
             for ($i = 0; $i < $sheetCount; $i++) {
@@ -714,9 +716,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                     foreach ($data as $key => $signal) {
                         if($key>0 && $signal[1] !== null){
                             $new = new RsnXTwoItems();
+                            $new->given_id =  $signal[0];
                             $new->name =  $signal[1];
                             $new->signal_campaign_id = $campaign_id;
-                            $new->preview =  $signal[2];
+                            $new->preview = $signal[2];
                             $new->save();
                             $signals[$signal[0]] = $new->id;
                         }
@@ -742,8 +745,8 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                             $new->item_id = $signals[$signal[0]];
                             $data=[];
                             foreach ($signal as $j => $value) {
-                                if ($j > 1 && count($labels) > $j ){
-                                    $data[$labels[$j]]=$value;
+                                if ($j > 1 && count($labels) > $j ) {
+                                    $data[$labels[$j]] = $value;
                                 }
                             }
                             $new->data =  json_encode($data);
@@ -754,18 +757,88 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                   
             }
 
+            if($domains != null){
+                $this->save_domains($domains, $signals);
+            }
+
+
 
         } catch (\Throwable $th) {
             dd($th->getMessage(), $th->getTrace());
-            DB::rollBack();
+           // DB::rollBack();
             return false;
         }
 
         Cache::forget('signal_campaigns_'.intval($campaign_id));
-        DB::commit();
+        //DB::commit();
 
     
         return true;
+
+    }
+
+    /**
+     * 
+     */
+    private function getFirstColumn($sheet){
+        // Obtener el rango de celdas de la primera columna
+        $column = $sheet->getColumnIterator('A')->current();
+
+        // Obtener los valores de la primera columna
+        $values = [];
+        foreach ($column->getCellIterator() as $cell) {
+            $values[] = $cell->getValue();
+        }
+        array_shift($values);
+        return $values;
+    }
+
+
+    private function save_domains($domains, $items)
+    {   
+       
+
+        $path = json_decode($domains,true);
+        $path =  public_path('/storage/'.$path[0]['download_link']);
+
+        //-----------------read------------------------
+        $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+        $spreadsheet = $reader->load($path);
+        $worksheet = $spreadsheet->getActiveSheet();
+
+
+        $column = $this->getFirstColumn($worksheet);
+
+        $domains = Domains::whereIn('url', $column)->get()->pluck('id','url')->toArray();
+
+
+        $headers = [];
+         
+        // Iterar por filas y columnas
+        foreach ($worksheet->toArray() as $key => $row) {
+    
+            if($key == 0){
+                $headers = $row;
+            }else{
+                if(!array_key_exists($row[0], $domains)){
+                    $new = Domains::create(['url' => $row[0]]);
+                    $domains[$row[0]] = $new->id;
+                }
+
+               
+                foreach ($row as $cellKey => $cell) {
+                    if($cellKey==0) continue;
+                    $relation = Rsn_x_two_items_domains::create([
+                        'rsn_x_two_item_id' => $items[$headers[$cellKey]],
+                        'domain_id' => $domains[$row[0]],
+                        'score'=>  $cell
+                    ]);
+                }
+
+            }
+            
+        }
+
 
     }
 

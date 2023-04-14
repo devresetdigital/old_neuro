@@ -14,8 +14,8 @@ use App\RsnSignalMythic;
 use App\RsnSignalPathosEthos;
 use App\RsnSignalPersonalState;
 use Illuminate\Support\Facades\Cache;
-
-
+use App\Rsn_x_two_items_domains;
+use Illuminate\Support\Facades\DB;
 class RsnSignalReports extends Controller
 {
     /**
@@ -30,6 +30,47 @@ class RsnSignalReports extends Controller
         }
 
         return response()->json( $signals );
+
+
+        
+    }
+
+
+    public function get_domains_by_item(Request $request, $id)
+    {
+        $query = Rsn_x_two_items_domains::where('rsn_x_two_item_id', $id)->with('domains:id,url');
+
+        // Si hay un valor de búsqueda, agregue una cláusula where para filtrar los resultados.
+        if ($request->has('search') && !empty($request->input('search.value'))) {
+            $query->whereHas('domains', function($q) use($request) {
+                $q->where('url', 'LIKE', '%' . $request->input('search.value') . '%');
+            });
+        }
+
+        // Obtener el número total de registros para usar en la respuesta de DataTable.
+        $total = $query->count();
+
+        // Obtener el número de registros filtrados para usar en la respuesta de DataTable.
+        $filtered = $query->count();
+
+        // Aplicar la paginación a la consulta.
+        $data = $query->paginate($request->input('length'));
+
+        // Transformar los resultados para la respuesta de DataTable.
+        $data = $data->map(function($item) {
+            return [
+                'score' => $item->score,
+                'url' => $item->domains->url
+            ];
+        });
+
+        // Devolver la respuesta de DataTable.
+        return [
+            'draw' => intval($request->input('draw')),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $filtered,
+            'data' => $data
+        ];
     }
 
     public function getCampaign(Request $request, $id){

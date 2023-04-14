@@ -13,7 +13,7 @@ class AddGivenIdToRsnSignalSignalsTable extends Migration
      */
     public function up()
     {
-        Schema::table('rsn_signal_signals', function (Blueprint $table) {
+        Schema::table('rsn_x_two_items', function (Blueprint $table) {
             $table->integer('given_id')->nullable(false);
         });
     }
@@ -25,7 +25,7 @@ class AddGivenIdToRsnSignalSignalsTable extends Migration
      */
     public function down()
     {
-        Schema::table('rsn_signal_signals', function (Blueprint $table) {
+        Schema::table('rsn_x_two_items', function (Blueprint $table) {
             $table->dropColumn('given_id');
         });
     }

@@ -248,6 +248,11 @@ chart
   background: #f1f7ff;
 }
 
+
+.containerTab{
+    min-height: 400px;
+}
+
 </style>
 <div class="page-content container-fluid">
     @include('voyager::alerts')

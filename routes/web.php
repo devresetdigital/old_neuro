@@ -21,7 +21,10 @@ Route::get('flush', function () {
    }
    return 'cannot flush the cache';
 });
-
+Route::get('iframes/domains_by_items_tables/{id}', function ($id) {
+    // Lógica para obtener los datos a mostrar en la vista
+    return view('iframes/domains_table', compact('id'));
+});
 
 //List Campaigns
 Route::get('import_locations','ImportLocationController@index');
@@ -122,5 +125,9 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('update_ssps','UpdateSspsController@index');
 
     Route::get('eventerstatus_v1.0', 'EventerStatusController@index');
+
+
+
+    
 
 });
