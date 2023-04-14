@@ -414,10 +414,11 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
         if (!$request->has('_validate')) {
 
-            $request->merge([
-                'assets' => UploaderHelper::formatData($request->input('assets'),$slug)
-            ]);
-
+            if ($request->assets) {
+                $request->merge([
+                    'assets' => UploaderHelper::formatData($request->input('assets'),$slug)
+                ]);
+            }
 
             $data = $this->insertUpdateData($request, $slug, $dataType->addRows, new $dataType->model_name());
 
