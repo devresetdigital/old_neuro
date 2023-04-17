@@ -305,12 +305,36 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 
                 file_get_contents($url);
 
-                if ($request->has('file_path') && $request->file_path) {
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?campaign_name={$data->name}";
+
+                if ($request->has('file_path') && $request->file_path && !$request->has('sitelist')) {
 
                     if ($_ENV['APP_DEBUG']) {
-                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?campaign_name={$data->name}&test=1";
+                        $url = $url . "&type=1&test=1";
                     } else {
-                        $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?&campaign_name={$data->name}";
+                        $url = $url . "&type=1";
+                    }
+
+                    file_get_contents($url);
+                }
+
+                if ($request->has('sitelist') && $request->sitelist && !$request->has('file_path')) {
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $url . "&type=2&test=1";
+                    } else {
+                        $url = $url . "&type=2";
+                    }
+
+                    file_get_contents($url);
+                }
+
+                if ($request->has('file_path') && $request->file_path && $request->has('sitelist') && $request->sitelist) {
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $url . "&type=3&test=1";
+                    } else {
+                        $url = $url . "&type=3";
                     }
 
                     file_get_contents($url);
