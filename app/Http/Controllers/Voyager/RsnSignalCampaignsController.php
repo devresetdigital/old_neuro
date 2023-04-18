@@ -293,55 +293,56 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
             try {
+                
                 $advertiser = Advertiser::find($data->advertiser_id);
-                $media_file = json_decode($data->assets, true);
-                $path = urlencode($media_file[0]["download_link"]);
 
-                if ($_ENV['APP_DEBUG']) {
-                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}&test=1";
-                } else {
-                    $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&assets={$path}&advertiser_name={$advertiser->name}";
+                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&advertiser_name={$advertiser->name}";
+                
+                $changes = $data->getChanges();
+                
+                if (isset($changes['assets']) && !isset($changes['sitelist'])) {
+
+                    $media_file = json_decode($data->assets, true);
+                    $path = urlencode($media_file[0]["download_link"]);
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $url . "&assets={$path}&type=1&test=1";
+                    } else {
+                        $url = $url . "&assets={$path}&type=1";
+                    }
+                }
+                
+                if (isset($changes['sitelist']) && !isset($changes['assets'])) {
+                    
+                    $sitelist_file = json_decode($data->sitelist, true);
+                    $sitelist_path = urlencode($sitelist_file[0]["download_link"]);
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $url . "&sitelist={$sitelist_path}&type=2&test=1";
+                    } else {
+                        $url = $url . "&sitelist={$sitelist_path}&type=2";
+                    }
+                }
+
+                if (isset($changes['sitelist']) && isset($changes['assets'])) {
+
+                    $media_file = json_decode($data->assets, true);
+                    $path = urlencode($media_file[0]["download_link"]);
+
+                    $sitelist_file = json_decode($data->sitelist, true);
+                    $sitelist_path = urlencode($sitelist_file[0]["download_link"]);
+
+                    if ($_ENV['APP_DEBUG']) {
+                        $url = $url . "&assets={$path}&sitelist={$sitelist_path}&type=3&test=1";
+                    } else {
+                        $url = $url . "&assets={$path}&sitelist={$sitelist_path}&type=3";
+                    }
                 }
                 
                 file_get_contents($url);
 
-                $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification-report-reviewed?campaign_name={$data->name}";
-
-                if ($request->has('file_path') && $request->file_path && !$request->has('sitelist')) {
-
-                    if ($_ENV['APP_DEBUG']) {
-                        $url = $url . "&type=1&test=1";
-                    } else {
-                        $url = $url . "&type=1";
-                    }
-
-                    file_get_contents($url);
-                }
-
-                if ($request->has('sitelist') && $request->sitelist && !$request->has('file_path')) {
-
-                    if ($_ENV['APP_DEBUG']) {
-                        $url = $url . "&type=2&test=1";
-                    } else {
-                        $url = $url . "&type=2";
-                    }
-
-                    file_get_contents($url);
-                }
-
-                if ($request->has('file_path') && $request->file_path && $request->has('sitelist') && $request->sitelist) {
-
-                    if ($_ENV['APP_DEBUG']) {
-                        $url = $url . "&type=3&test=1";
-                    } else {
-                        $url = $url . "&type=3";
-                    }
-
-                    file_get_contents($url);
-                }
-
             } catch (\Throwable $th) {
-
+                dd("Error to send notification");
             }
 
             event(new BreadDataUpdated($dataType, $data));
