@@ -34,7 +34,7 @@
                         {{ csrf_field() }}
 
                         <div class="panel-body">
-
+                            
                             @if (count($errors) > 0)
                                 <div class="alert alert-danger">
                                     <ul>
@@ -44,7 +44,6 @@
                                     </ul>
                                 </div>
                             @endif
-
 
                             @if (session()->has('errors'))
                                 <div class="alert alert-danger">
@@ -83,10 +82,10 @@
                                             <label for="name">{{ $row->display_name }}</label>
                                             @include('voyager::multilingual.input-hidden-bread-edit-add')
                                             @if($row->type == 'relationship')
-                                                @if ($row->field=='rsn_signal_campaign_belongsto_advertiser_relationship')
-                                                    <select class="form-control select2 select2-hidden-accessible" name="advertiser_id" tabindex="-1" aria-hidden="true">
+                                            @if (strtolower($row->display_name) == "advertisers")
+                                                    <select class="form-control" name="advertiser_id" tabindex="-1" aria-hidden="true">
                                                         @foreach ($advertisers as $advertiser)
-                                                         <option value="{{ $advertiser['id'] }}" selected="">{{ $advertiser['name'] }}</option>
+                                                         <option value="{{ $advertiser->id }}" @if($advertiser->id == $dataTypeContent->advertiser_id) selected @endif>{{ $advertiser->name }}</option>
                                                         @endforeach
                                                     </select>
                                                 @else

@@ -238,7 +238,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         if($is_admin){
             $advertisers = Advertiser::all();
         }else{
-            $advertisers = Advertiser::where('organization_id' ,Auth::user()->organization_id )->get();
+            $advertisers = Advertiser::where('organization_id', Auth::user()->organization_id )->get();
         }
 
         return Voyager::view($view, compact('dataType', 'advertisers', 'dataTypeContent', 'isModelTranslatable'));
@@ -285,11 +285,14 @@ class RsnSignalCampaignsController extends VoyagerBaseController
              * import data into tables
              */
 
+            $changes = $data->getChanges();
 
-            if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
-                $errors=['there was an error trying to import the data, please try again'];
-                return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
-                ->with(compact('errors'));
+            if (isset($changes['file_path']) && isset($changes['id']) && isset($changes['type'])) {
+                if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
+                    $errors=['there was an error trying to import the data, please try again!!!!'];
+                    return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
+                    ->with(compact('errors'));
+                }
             }
 
             try {
@@ -298,7 +301,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
                 $url = $_ENV['NOTIFICATIONS_URL']."/send-neuro-notification?campaign_id={$data->id}&campaign_name={$data->name}&campaign_type={$data->type}&advertiser_name={$advertiser->name}";
                 
-                $changes = $data->getChanges();
+                
                 
                 if (isset($changes['assets']) && !isset($changes['sitelist'])) {
 
@@ -342,7 +345,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 file_get_contents($url);
 
             } catch (\Throwable $th) {
-                dd("Error to send notification");
+                // dd("Error to send notification");
             }
 
             event(new BreadDataUpdated($dataType, $data));
