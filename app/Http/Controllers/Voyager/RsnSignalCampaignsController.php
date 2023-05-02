@@ -845,7 +845,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         // Iterar por filas y columnas
         foreach ($worksheet->toArray() as $key => $row) {
             
-            if($row[0]!=NULL || $row[0]!=''){
+            if($row[0]==NULL || $row[0]==''){
                 continue;
             }
             if($key == 0){
