@@ -856,6 +856,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                
                 foreach ($row as $cellKey => $cell) {
                     if($cellKey==0) continue;
+
+                    if(!array_key_exists($headers[$cellKey],$items)) continue;
+                    
                     $relation = Rsn_x_two_items_domains::create([
                         'rsn_x_two_item_id' => $items[$headers[$cellKey]],
                         'domain_id' => $domains[$row[0]],
