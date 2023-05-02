@@ -844,7 +844,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
          
         // Iterar por filas y columnas
         foreach ($worksheet->toArray() as $key => $row) {
-    
+            
+            if($row[0]!=NULL || $row[0]!=''){
+                continue;
+            }
             if($key == 0){
                 $headers = $row;
             }else{
@@ -858,7 +861,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                     if($cellKey==0) continue;
 
                     if(!array_key_exists($headers[$cellKey],$items)) continue;
-                    
+
                     $relation = Rsn_x_two_items_domains::create([
                         'rsn_x_two_item_id' => $items[$headers[$cellKey]],
                         'domain_id' => $domains[$row[0]],
