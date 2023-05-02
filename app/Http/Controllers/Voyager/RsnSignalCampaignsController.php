@@ -19,7 +19,7 @@ use TCG\Voyager\Models\DataType;
 use TCG\Voyager\Models\Permission;
 use TCG\Voyager\Http\Controllers\VoyagerBaseController;
 use TCG\Voyager\Http\Controllers\Traits\BreadRelationshipParser;
-
+use Illuminate\Support\Facades\Log;
 use TCG\Voyager\Events\BreadDataAdded;
 use TCG\Voyager\Events\BreadDataDeleted;
 use TCG\Voyager\Events\BreadDataUpdated;
@@ -41,6 +41,7 @@ use Auth;
 use JsonSchema\Uri\Retrievers\FileGetContents;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
 
 
 class RsnSignalCampaignsController extends VoyagerBaseController
@@ -287,12 +288,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
             $changes = $data->getChanges();
 
-            if (isset($changes['file_path']) && isset($changes['id']) && isset($changes['type'])) {
-                if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
-                    $errors=['there was an error trying to import the data, please try again!!!!'];
-                    return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
-                    ->with(compact('errors'));
-                }
+            if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
+                $errors=['there was an error trying to import the data, please try again!!!!'];
+                return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
+                ->with(compact('errors'));
             }
 
             try {
@@ -487,7 +486,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
                 file_get_contents($url);
             } catch (\Throwable $th) {
-                
+                dd($th->getMessage(), $th->getTrace());
             }
             return redirect()
                 ->route("voyager.{$dataType->slug}.index")
