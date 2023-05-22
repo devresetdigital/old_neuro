@@ -54,9 +54,12 @@ class RsnSignalReports extends Controller
         $filtered = $query->count();
 
         $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
 
         // Aplicar la paginación a la consulta.
-        $data = $query->skip($start)->paginate($request->input('length'));
+        $data = $query->skip($start)
+              ->take($rowperpage)
+              ->get();
 
         // Transformar los resultados para la respuesta de DataTable.
         $data = $data->map(function($item) {
