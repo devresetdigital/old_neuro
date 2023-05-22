@@ -53,8 +53,10 @@ class RsnSignalReports extends Controller
         // Obtener el número de registros filtrados para usar en la respuesta de DataTable.
         $filtered = $query->count();
 
+        $start = $request->get("start");
+
         // Aplicar la paginación a la consulta.
-        $data = $query->paginate($request->input('length'));
+        $data = $query->skip($start)->paginate($request->input('length'));
 
         // Transformar los resultados para la respuesta de DataTable.
         $data = $data->map(function($item) {
