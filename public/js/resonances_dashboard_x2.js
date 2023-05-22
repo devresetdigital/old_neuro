@@ -153,10 +153,10 @@ const loadSignals = () => {
                     </video>
             `;
     } else if (
-      preview_url.indexOf(".jpeg") >= 0 ||
-      preview_url.indexOf(".jpg") >= 0 ||
-      preview_url.indexOf(".png") >= 0 ||
-      preview_url.indexOf(".svg") >= 0
+      preview_url.toLowerCase().indexOf(".jpeg") >= 0 ||
+      preview_url.toLowerCase().indexOf(".jpg") >= 0 ||
+      preview_url.toLowerCase().indexOf(".png") >= 0 ||
+      preview_url.toLowerCase().indexOf(".svg") >= 0
     ) {
       preview = `
             <div style="
