@@ -156,6 +156,7 @@ const loadSignals = () => {
       preview_url.toLowerCase().indexOf(".jpeg") >= 0 ||
       preview_url.toLowerCase().indexOf(".jpg") >= 0 ||
       preview_url.toLowerCase().indexOf(".png") >= 0 ||
+      preview_url.toLowerCase().indexOf(".gif") >= 0 ||
       preview_url.toLowerCase().indexOf(".svg") >= 0
     ) {
       preview = `
