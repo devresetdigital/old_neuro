@@ -38,7 +38,7 @@ class RsnSignalReports extends Controller
 
     public function get_domains_by_item(Request $request, $id)
     {
-        $query = Rsn_x_two_items_domains::where('rsn_x_two_item_id', $id)->with('domains:id,url');
+        $query = Rsn_x_two_items_domains::where('rsn_x_two_item_id', $id)->orderBy('score', 'desc')->with('domains:id,url');
 
         // Si hay un valor de búsqueda, agregue una cláusula where para filtrar los resultados.
         if ($request->has('search') && !empty($request->input('search.value'))) {
