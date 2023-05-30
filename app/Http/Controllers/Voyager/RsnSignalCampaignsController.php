@@ -288,7 +288,10 @@ class RsnSignalCampaignsController extends VoyagerBaseController
 
             $changes = $data->getChanges();
 
-            if(!$this->import_data($data->file_path,$data->id,$data->type, $data->domains_report)) {
+            $domain_report = isset($changes['domains_report']) ? $changes['domains_report'] : null;
+            $report = isset($changes['file_path']) ? $changes['file_path'] : null;
+
+            if(!$this->import_data($report, $data->id, $data->type, $domain_report)) {
                 $errors=['there was an error trying to import the data, please try again!!!!'];
                 return redirect()->route('voyager.'.$dataType->slug.'.edit', ['user' => $data->id])
                 ->with(compact('errors'));
@@ -699,7 +702,6 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         if($path == null){
             return true;
         }
-     
        
         switch ($type) {
             case 'hao':
@@ -714,16 +716,15 @@ class RsnSignalCampaignsController extends VoyagerBaseController
                 break;
         }
 
-       
-
     }
 
-    private function x2_import($path, $campaign_id, $domains=null){
+    private function x2_import($path=null, $campaign_id, $domains=null){
         
         try {
 
             //DB::beginTransaction();
 
+            
             $this->deleteData($campaign_id);
 
             $path = json_decode($path,true);
@@ -736,6 +737,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             $signals = [];
 
             $sheetCount = $spreadsheet->getSheetCount();
+            
             for ($i = 0; $i < $sheetCount; $i++) {
                 $data = $spreadsheet->getSheet($i)->toArray();
 
@@ -786,7 +788,7 @@ class RsnSignalCampaignsController extends VoyagerBaseController
             }
 
             if($domains != null){
-                $this->save_domains($domains, $signals);
+                $this->save_domains($domains, $campaign_id);
             }
 
 
@@ -822,10 +824,11 @@ class RsnSignalCampaignsController extends VoyagerBaseController
     }
 
 
-    private function save_domains($domains, $items)
-    {   
-       
+    private function save_domains($domains, $campaign_id)
+    {
 
+        $items = RsnXTwoItems::where('signal_campaign_id',$campaign_id)->get()->pluck('id','given_id')->toArray();
+        
         $path = json_decode($domains,true);
         $path =  public_path('/storage/'.$path[0]['download_link']);
 
@@ -834,11 +837,9 @@ class RsnSignalCampaignsController extends VoyagerBaseController
         $spreadsheet = $reader->load($path);
         $worksheet = $spreadsheet->getActiveSheet();
 
-
         $column = $this->getFirstColumn($worksheet);
 
         $domains = Domains::whereIn('url', $column)->get()->pluck('id','url')->toArray();
-
 
         $headers = [];
          
