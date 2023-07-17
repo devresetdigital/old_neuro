@@ -286,10 +286,10 @@ const loadSignalChart = (chartData, id) => {
         labels.push(name);
         series.push(((parseFloat(value) * 100) / totalScore).toFixed(2));
         //series.push((parseFloat(value)*100/totalScore).toFixed(2));
-      }
-      limit--;
-      if (limit == 0) {
-        break;
+        limit--;
+        if (limit == 0) {
+          break;
+        }
       }
     }
 
