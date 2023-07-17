@@ -256,7 +256,8 @@ const loadSignalChart = (chartData, id) => {
       }
     }
     let average = totalScore / count;
-    let limitToShow = average + (maxValue - average) / 4;
+    //let limitToShow = average + (maxValue - average) / 4;
+    let limitToShow = 0.01;
     for (let [name, value] of Object.entries(data)) {
       if (Object.keys(data).length <= 10 || parseFloat(value) >= limitToShow) {
         keyToShow.push(name);
@@ -279,11 +280,16 @@ const loadSignalChart = (chartData, id) => {
         count++;
       }
     }
+    let limit = 10;
     for (let [name, value] of Object.entries(data)) {
       if (keyToShow.includes(name)) {
         labels.push(name);
         series.push(((parseFloat(value) * 100) / totalScore).toFixed(2));
         //series.push((parseFloat(value)*100/totalScore).toFixed(2));
+      }
+      limit--;
+      if (limit == 0) {
+        break;
       }
     }
 
